@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired
 
 # Creating Login Form contains email and password
 class LoginForm(Form):
-    username = StringField("Email", validators=[validators.Length(min=7, max=50),
+    username = StringField("Username", validators=[validators.Length(min=7, max=50),
                                                 validators.DataRequired(message="Please Fill This Field")])
 
     password = PasswordField("Password", validators=[validators.DataRequired(message="Please Fill This Field")])
@@ -14,7 +14,7 @@ class LoginForm(Form):
 # Creating Registration Form contains username, name, email, password and confirm password.
 
 class RegisterForm(Form):
-    username = StringField("Username", validators=[validators.Length(min=3, max=25),
+    username = StringField("Username", validators=[validators.Length(min=3, max=50),
                                                    validators.DataRequired(message="Please Fill This Field")])
 
     email = StringField("Email", validators=[validators.Email(message="Please enter a valid email address")])
@@ -23,7 +23,15 @@ class RegisterForm(Form):
 
         validators.DataRequired(message="Please Fill This Field"),
 
-        validators.EqualTo(fieldname="confirm", message="Your Passwords Do Not Match")
     ])
 
-    confirm = PasswordField("Confirm Password", validators=[validators.DataRequired(message="Please Fill This Field")])
+class PasswordForm(Form):
+    password = PasswordField("Password", validators=[
+
+        validators.DataRequired(message="Please Fill This Field"),
+
+    ])
+
+class UsernameForm(Form):
+    username = StringField("Username", validators=[validators.Length(min=3, max=50),
+                                                   validators.DataRequired(message="Please Fill This Field")])
