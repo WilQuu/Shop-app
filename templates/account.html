@@ -1,3 +1,4 @@
+{% from "includes/formhelpers.html" import render_field %}
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
@@ -8,10 +9,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="../static/main.css">
+    <link href="css/bootstrap-form-helpers.min.css" rel="stylesheet" media="screen">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-
 <div class="header">
     <div class="container">
         <div class="navbar">
@@ -20,7 +31,7 @@
             </div>
             <nav>
                 <ul id="MenuItems">
-                     <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html">Home</a></li>
                     <li><a href="product.html">Products</a></li>
                     <li><a href="">About</a></li>
                     {% if session.logged_in %}
@@ -40,78 +51,20 @@
     </div>
 </div>
 
-<!------------ cart items details ------------->
-<div class="small-cointainer cart-page">
-    <table>
-        <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-        </tr>
-        <tr>
-            <td>
-                <div class="cart-info">
-                    <img src="{{ url_for('static', filename='images/buy-1.jpg') }}">
-                    <div>
-                        <p>Red Printed T-Shirt</p>
-                        <small>Price: $50.00</small>
-                        <br>
-                        <a href="">Remove</a>
-                    </div>
-                </div>
-            </td>
-            <td><input type="number" value="1"></td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="cart-info">
-                    <img src="{{ url_for('static', filename='images/buy-2.jpg') }}">
-                    <div>
-                        <p>Red Printed T-Shirt</p>
-                        <small>Price: $50.00</small>
-                        <br>
-                        <a href="">Remove</a>
-                    </div>
-                </div>
-            </td>
-            <td><input type="number" value="1"></td>
-            <td>$50.00</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="cart-info">
-                    <img src="{{ url_for('static', filename='images/buy-3.jpg') }}">
-                    <div>
-                        <p>Red Printed T-Shirt</p>
-                        <small>Price: $60.00</small>
-                        <br>
-                        <a href="">Remove</a>
-                    </div>
-                </div>
-            </td>
-            <td><input type="number" value="1"></td>
-            <td>$150.00</td>
-        </tr>
-    </table>
 
-    <div class="total-price">
-        <table>
-            <tr>
-                <td>Total price:</td>
-                <td>$260.00</td>
-
-            </tr>
-
-
-        </table>
-
+<!---------- account settings ---------->
+{% for mesg in get_flashed_messages() %}
+    <h1>{{ mesg }}</h1>
+{% endfor %}
+<div class="user-profile">
+    <div class="page-header">
+        <h2>Password Change</h2>
     </div>
-
-
+    <div class="account-container">
+        <a href="new-password.html">New Password Click Here!</a>
+        <a href="new-username.html">New Username Click Here!</a>
+    </div>
 </div>
-
-
 <!------------footer------->
 <div class="footer">
     <div class="container">
@@ -164,8 +117,16 @@
         }
     }
 </script>
-
-
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<hr>
 </body>
 </html>
 

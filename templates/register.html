@@ -24,8 +24,13 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="product.html">Products</a></li>
                     <li><a href="">About</a></li>
-                    <li><a href="login.html">Login</a></li>
-                    <li><a href="register.html">Register</a></li>
+                    {% if session.logged_in %}
+                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/account/">Account</a></li>
+                    {% else %}
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    {% endif %}
                 </ul>
             </nav>
             <a href="cart.html"><img src="{{ url_for('static', filename='images/cart.png') }}" width="30px"
@@ -50,10 +55,12 @@
                         <span>Register</span>
                     </div>
                     <form id="RegForm" method="POST" action="/register.html">
+                        <div class="form-log-reg">
                         {{ render_field(form.username, class="form-control") }}
                         {{ render_field(form.email, class="form-control") }}
                         {{ render_field(form.password, class="form-control") }}
                         <button type="submit" class="btn">Register</button>
+                        </div>
                     </form>
 
                 </div>
