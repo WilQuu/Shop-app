@@ -52,10 +52,14 @@
         </select>
 
     </div>
+
+
+{%  for row in data  %}
     <div class="row">
+
         <div class="col-4">
-            <img src="{{ url_for('static', filename='images/product-1.jpg') }}">
-            <h4>Red Printed T-Shirt</h4>
+            <img src="{{ url_for('static', filename='images/' + row[1]) }}">
+            <h4>{{row[0]}}</h4>
             <div class="rating">
                 <i class="fa fa-star"></i>
                 <i class="fa fa-star"></i>
@@ -64,63 +68,11 @@
                 <i class="fa fa-star-o"></i>
 
             </div>
-            <p>$50.00</p>
 
-
+            <p>${{ row[2]}}</p>
         </div>
-
-        <div class="col-4">
-            <img src="{{ url_for('static', filename='images/product-2.jpg') }}">
-            <h4>Black shoes</h4>
-            <div class="rating">
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star-half-o"></i>
-                <i class="fa fa-star-o"></i>
-
-            </div>
-            <p>$50.00</p>
-
-
-        </div>
-
-        <div class="col-4">
-            <img src="{{ url_for('static', filename='images/product-3.jpg') }}">
-            <h4>Grey trousers</h4>
-            <div class="rating">
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star-o"></i>
-                <i class="fa fa-star-o"></i>
-
-            </div>
-            <p>$50.00</p>
-
-
-        </div>
-
-        <div class="col-4">
-            <img src="{{ url_for('static', filename='images/product-4.jpg') }}">
-            <h4>Blue Puma Polo</h4>
-            <div class="rating">
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star-o"></i>
-
-            </div>
-            <p>$50.00</p>
-
-
-        </div>
-
-    </div>
-
-
 </div>
+    {% endfor %}
 
 <div class="page-btn">
     <span>1</span>

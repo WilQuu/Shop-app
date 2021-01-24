@@ -184,7 +184,8 @@ def cart():
 @app.route("/product.html")
 def product():
 
-    mycursor.execute("SELECT nazwa_produktu, nazwa_jpg, cena FROM produkty, galeria_zdjec")
+    mycursor.execute("Select produkty.nazwa_produktu, galeria_zdjec.nazwa_jpg, produkty.cena from produkty inner join galeria_zdjec on galeria_zdjec.id_produktu = produkty.id_produkt")
+
     data = mycursor.fetchall();
     return render_template("product.html", data = data)
 

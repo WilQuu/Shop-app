@@ -1,3 +1,6 @@
+from sqlalchemy.testing import db
+
+
 class User(db.Model):
 
     __tablename__ = 'usertable'
