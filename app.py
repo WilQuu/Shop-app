@@ -3,14 +3,28 @@ from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 #from sqlalchemy.sql import exists
 from flask_bootstrap import Bootstrap
+from sqlalchemy.dialects.postgresql import psycopg2
+
 from forms import LoginForm, RegisterForm, PasswordForm, UsernameForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, logout_user, login_required, current_user, login_user, UserMixin
+from flask import Flask, request,render_template
+import psycopg2
+
+try:
+    conn = psycopg2.connect(database="postgres", user="postgres",
+    password="dupa", host="localhost")
+    print("connected")
+except:
+    print ("I am unable to connect to the database")
+mycursor = conn.cursor()
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '!9m@S-dThyIlW[pHQbN^'
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:123@localhost/fk_shop_db'
+#app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:123@localhost'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:dupa@localhost:5432'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -169,7 +183,10 @@ def cart():
 
 @app.route("/product.html")
 def product():
-    return render_template("product.html")
+
+    mycursor.execute("SELECT nazwa_produktu, nazwa_jpg, cena FROM produkty, galeria_zdjec")
+    data = mycursor.fetchall();
+    return render_template("product.html", data = data)
 
 
 @app.route("/product-details.html")
