@@ -1,30 +1,28 @@
 from flask import Flask, render_template, flash, redirect, request, session, logging, url_for
+from flask_admin import Admin, BaseView, expose, AdminIndexView
+from flask_admin.contrib.sqla import ModelView
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
-#from sqlalchemy.sql import exists
+# from sqlalchemy.sql import exists
 from flask_bootstrap import Bootstrap
-from sqlalchemy.dialects.postgresql import psycopg2
-
-from forms import LoginForm, RegisterForm, PasswordForm, UsernameForm
+from forms import LoginForm, RegisterForm, PasswordForm, UsernameForm, SelectForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, logout_user, login_required, current_user, login_user, UserMixin
-from flask import Flask, request,render_template
 import psycopg2
+from sqlalchemy import create_engine
 
 try:
     conn = psycopg2.connect(database="postgres", user="postgres",
-    password="dupa", host="localhost")
+                            password="123", host="localhost")
     print("connected")
 except:
-    print ("I am unable to connect to the database")
+    print("I am unable to connect to the database")
 mycursor = conn.cursor()
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '!9m@S-dThyIlW[pHQbN^'
 
-#app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:123@localhost'
-app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:dupa@localhost:5432'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:123@localhost/fk_shop_db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -34,6 +32,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 db = SQLAlchemy(app)
+
+admin = Admin(app, template_mode="bootstrap3")
+
+main_order = []
 
 
 class Users(db.Model, UserMixin):
@@ -68,6 +70,46 @@ class Products(db.Model):
     price = db.Column(db.Integer)
     id_brand = db.Column(db.Integer, db.ForeignKey('brands.id_brand'))
     id_category = db.Column(db.Integer, db.ForeignKey('categories.id_category'))
+    main_photo = db.Column(db.String(50))
+
+
+class Orders(db.Model):
+    id_order = db.Column(db.Integer, primary_key=True)
+    id_user = db.Column(db.Integer)
+    price = db.Column(db.Integer)
+
+
+class UsersModelView(ModelView):
+    def is_accessible(self):
+        if session['username'] == 'admin':
+            return True
+        else:
+            return False
+
+
+class MyModelView(ModelView):
+    def is_accessible(self):
+        if session['username'] == 'admin' or session['username'] == 'moderator':
+            return True
+        else:
+            return False
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
+
+admin.add_view(UsersModelView(Users, db.session))
+admin.add_view(UsersModelView(Orders,db.session))
+admin.add_view(MyModelView(Products, db.session))
+
+
+class Order():
+    product = Products()
+
+    def __init__(self, Products, quantity, total_price):
+        self.product = Products
+        self.quantity = quantity
+        self.total_price = total_price
 
 
 @login_manager.user_loader
@@ -78,10 +120,11 @@ def load_user(user_id):
 @app.route('/')
 @app.route('/index.html')
 def home():
+    session['orders'] = []
     return render_template("index.html")
 
 
-@app.route("/login.html", methods=['POST', 'GET'])
+@app.route("/login", methods=['POST', 'GET'])
 def login():
     # Creating Login form object
     form = LoginForm(request.form)
@@ -102,17 +145,18 @@ def login():
 
                 login_user(user)
                 # After successful login, redirecting to home page
-                if user.username == 'admin':
-                    return redirect(url_for('admin'))
-                else:
-                    return redirect(url_for('home'))
+                # if user.username == 'admin' or user.username =='moderator':
+                #   return redirect(url_for('admin'))
+                # else:
+                return redirect(url_for('home'))
 
-            else:
+        else:
 
-                # if password is in correct , redirect to login page
-                flash('Username or Password Incorrect', "info")
+            # if password is in correct , redirect to login page
+            flash('Username or Password Incorrect', "info")
 
-                return redirect(url_for('product'))
+            return redirect(url_for('product'))
+
     # rendering login page
     return render_template('login.html', form=form)
 
@@ -129,7 +173,7 @@ def admin_panel():
     return render_template("admin-panel.html")
 
 
-@app.route("/register.html", methods=['POST', 'GET'])
+@app.route("/register", methods=['POST', 'GET'])
 def register():
     # Creating RegistrationForm class object
     form = RegisterForm(request.form)
@@ -154,8 +198,6 @@ def register():
 
         db.session.commit()
 
-        flash('You have successfully registered', 'success')
-
         # if registration successful, then redirecting to login Api
         return redirect(url_for('login'))
 
@@ -172,27 +214,64 @@ def logout():
     logout_user()
     session['logged_in'] = False
     # redirecting to home page
-    flash('You are logged out!', "INFO")
     return redirect(url_for('home'))
 
 
-@app.route("/cart.html")
+@app.route("/buy-items")
+@login_required
+def buy_items():
+    total_price = 0
+    for item in main_order:
+        total_price += item.product.price
+
+    username = session['username']
+    user = Users().query.filter_by(username=username).first()
+    id_user = user.id
+
+    new_order = Orders(id_user=id_user,price=total_price)
+
+    db.session.add(new_order)
+    db.session.commit()
+    main_order.clear()
+
+    return redirect(url_for('home'))
+
+
+@app.route("/add-items/<product_name>/<quantity>", methods=['GET', 'POST'])
+def add_items(product_name, quantity):
+    product = Products().query.filter_by(product_name=product_name).first()
+    if request.method == 'GET':
+        print(product.price)
+        total_price = quantity * product.price
+        new_order = Order(product, quantity, total_price)
+        main_order.append(new_order)
+
+    return redirect(url_for('product_details', product_name=product_name))
+
+
+@app.route("/cart", methods=['GET', 'POST'])
 def cart():
-    return render_template("cart.html")
+    return render_template("cart.html", order=main_order)
 
 
-@app.route("/product.html")
+@app.route("/product.html", methods=["POST", "GET"])
 def product():
+    form = SelectForm(request.form)
+    data = Products.query.all()
 
-    mycursor.execute("Select produkty.nazwa_produktu, galeria_zdjec.nazwa_jpg, produkty.cena from produkty inner join galeria_zdjec on galeria_zdjec.id_produktu = produkty.id_produkt")
+    # mycursor.execute("select products.product_name, products.main_photo, products.price from Products")
 
-    data = mycursor.fetchall();
-    return render_template("product.html", data = data)
+    # data = mycursor.fetchall()
+
+    return render_template("product.html", data=data, form=form)
 
 
-@app.route("/product-details.html")
-def product_details():
-    return render_template("product-details.html")
+@app.route("/product-details/<product_name>", methods=["POST", "GET"])
+def product_details(product_name):
+    form = SelectForm(request.form)
+    product = Products.query.filter_by(product_name=product_name).first()
+
+    return render_template("product-details.html", product=product, form=form)
 
 
 @app.route("/new-password.html", methods=["GET", "POST"])
@@ -211,7 +290,7 @@ def user_password_change():
     return render_template('new-password.html', form=form)
 
 
-@app.route("/account.html")
+@app.route("/account/")
 @login_required
 def account():
     return render_template('account.html')
