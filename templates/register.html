@@ -21,15 +21,18 @@
             </div>
             <nav>
                 <ul id="MenuItems">
-                    <li><a href="index.html">Home</a></li>
+                     <li><a href="/">Home</a></li>
                     <li><a href="product.html">Products</a></li>
                     <li><a href="">About</a></li>
-                    {% if session.logged_in %}
+                    {% if session.logged_in and session['username'] == ('admin' or 'moderator') %}
+                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/admin">Admin Panel</a></li>
+                    {% elif session.logged_in %}
                         <li><a href="/logout/">Logout</a></li>
                         <li><a href="/account/">Account</a></li>
                     {% else %}
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Register</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -54,7 +57,7 @@
                     <div class="form-btn">
                         <span>Register</span>
                     </div>
-                    <form id="RegForm" method="POST" action="/register.html">
+                    <form id="RegForm" method="POST" action="/register">
                         <div class="form-log-reg">
                         {{ render_field(form.username, class="form-control") }}
                         {{ render_field(form.email, class="form-control") }}

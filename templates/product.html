@@ -1,3 +1,4 @@
+{% from "includes/formhelpers.html" import render_field %}
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
@@ -19,19 +20,22 @@
             </div>
             <nav>
                 <ul id="MenuItems">
-                     <li><a href="index.html">Home</a></li>
+                    <li><a href="/">Home</a></li>
                     <li><a href="product.html">Products</a></li>
                     <li><a href="">About</a></li>
-                    {% if session.logged_in %}
+                    {% if session.logged_in and session['username'] == ('admin' or 'moderator') %}
+                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/admin">Admin Panel</a></li>
+                    {% elif session.logged_in %}
                         <li><a href="/logout/">Logout</a></li>
                         <li><a href="/account/">Account</a></li>
                     {% else %}
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Register</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
                     {% endif %}
                 </ul>
             </nav>
-            <a href="cart.html"><img src="{{ url_for('static', filename='images/cart.png') }}" width="30px"
+            <a href="/cart"><img src="{{ url_for('static', filename='images/cart.png') }}" width="30px"
                                      height="30px"></a>
             <img src="{{ url_for('static', filename='images/menu.png') }}" class="menu-icon" onclick="menutoggle()">
         </div>
@@ -42,98 +46,92 @@
 <div class="small-cointainer">
     <div class="row row-2">
         <h2>All Products</h2>
-        <select>
-            <option>Default Sorting</option>
-            <option>Sort by price</option>
-            <option>Sort by popularity</option>
-            <option>Sort by rating</option>
-            <option>Sort by sale</option>
-
-        </select>
+       {{ render_field(form.sort, class="form-control") }}
 
     </div>
 
 
-{%  for row in data  %}
-    <div class="row">
+    {% for row in data %}
+        <div class="row">
 
-        <div class="col-4">
-            <img src="{{ url_for('static', filename='images/' + row[1]) }}">
-            <h4>{{row[0]}}</h4>
-            <div class="rating">
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star"></i>
-                <i class="fa fa-star-o"></i>
+            <div class="col-4">
+                <a href='/product-details/{{ row.product_name }}'>
+                    <img src="{{ url_for('static', filename='images/' + row.main_photo) }}">
+                    <h4>{{ row.product_name }}</h4>
+                    <div class="rating">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star-o"></i>
 
+                    </div>
+
+                    <p>${{ row.price }}</p>
+                    <a/>
             </div>
-
-            <p>${{ row[2]}}</p>
         </div>
-</div>
     {% endfor %}
 
-<div class="page-btn">
-    <span>1</span>
-    <span>2</span>
-    <span>3</span>
-    <span>4</span>
-    <span>&#8594;</span>
-</div>
+    <div class="page-btn">
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+        <span>&#8594;</span>
+    </div>
 
-<!------------footer------->
-<div class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="footer-col-1">
-                <h3>Lorem Ipsum</h3>
-                <p>Lorem Ipsum is a dummy text.</p>
-                <div class="app-logo">
-                    <img src="{{ url_for('static', filename='images/play-store.png') }}">
-                    <img src="{{ url_for('static', filename='images/app-store.png') }}">
+    <!------------footer------->
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="footer-col-1">
+                    <h3>Lorem Ipsum</h3>
+                    <p>Lorem Ipsum is a dummy text.</p>
+                    <div class="app-logo">
+                        <img src="{{ url_for('static', filename='images/play-store.png') }}">
+                        <img src="{{ url_for('static', filename='images/app-store.png') }}">
+                    </div>
                 </div>
-            </div>
-            <div class="footer-col-2">
-                <img src="{{ url_for('static', filename='images/logo-white.png') }}">
-                <p>Lorem Ipsum is a dummy text.</p>
-            </div>
-            <div class="footer-col-3">
-                <h3>Useful Links</h3>
-                <ul>
-                    <li>Coupons</li>
-                    <li>Blog Post</li>
-                    <li>Return Policy</li>
-                    <li>Join Affiliate</li>
-                </ul>
-            </div>
-            <div class="footer-col-4">
-                <h3>Follow us</h3>
-                <ul>
-                    <li>Facebook</li>
-                    <li>Twitter</li>
-                    <li>Instagram</li>
-                    <li>YouTube</li>
-                </ul>
+                <div class="footer-col-2">
+                    <img src="{{ url_for('static', filename='images/logo-white.png') }}">
+                    <p>Lorem Ipsum is a dummy text.</p>
+                </div>
+                <div class="footer-col-3">
+                    <h3>Useful Links</h3>
+                    <ul>
+                        <li>Coupons</li>
+                        <li>Blog Post</li>
+                        <li>Return Policy</li>
+                        <li>Join Affiliate</li>
+                    </ul>
+                </div>
+                <div class="footer-col-4">
+                    <h3>Follow us</h3>
+                    <ul>
+                        <li>Facebook</li>
+                        <li>Twitter</li>
+                        <li>Instagram</li>
+                        <li>YouTube</li>
+                    </ul>
+                </div>
+
             </div>
 
         </div>
-
     </div>
-</div>
-<!-------------- js for toggle menu ------------->
-<script>
-    var MenuItems = document.getElementById("MenuItems");
-    MenuItems.style.maxHeight = "0px";
+    <!-------------- js for toggle menu ------------->
+    <script>
+        var MenuItems = document.getElementById("MenuItems");
+        MenuItems.style.maxHeight = "0px";
 
-    function menutoggle() {
-        if (MenuItems.style.maxHeight == "0px") {
-            MenuItems.style.maxHeight = "200px";
-        } else {
-            MenuItems.style.maxHeight = "0px";
+        function menutoggle() {
+            if (MenuItems.style.maxHeight == "0px") {
+                MenuItems.style.maxHeight = "200px";
+            } else {
+                MenuItems.style.maxHeight = "0px";
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
-

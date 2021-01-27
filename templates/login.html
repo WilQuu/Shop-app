@@ -31,19 +31,22 @@
             </div>
             <nav>
                 <ul id="MenuItems">
-                     <li><a href="index.html">Home</a></li>
+                    <li><a href="/">Home</a></li>
                     <li><a href="product.html">Products</a></li>
                     <li><a href="">About</a></li>
-                    {% if session.logged_in %}
+                    {% if session.logged_in and session['username'] == ('admin' or 'moderator') %}
+                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/admin">Admin Panel</a></li>
+                    {% elif session.logged_in %}
                         <li><a href="/logout/">Logout</a></li>
                         <li><a href="/account/">Account</a></li>
                     {% else %}
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Register</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
                     {% endif %}
                 </ul>
             </nav>
-            <a href="cart.html"><img src="{{ url_for('static', filename='images/cart.png') }}" width="30px"
+            <a href="/cart"><img src="{{ url_for('static', filename='images/cart.png') }}" width="30px"
                                      height="30px"></a>
             <img src="{{ url_for('static', filename='images/menu.png') }}" class="menu-icon" onclick="menutoggle()">
         </div>
@@ -63,7 +66,7 @@
                 <div class="form-container">
                     <div class="form-btn">
                         <span>Login</span>
-                        <form id="RegForm" method="POST" action="/login.html">
+                        <form id="RegForm" method="POST" action="/login">
                             <div class="form-log-reg">
                                 {{ render_field(form.username, class="form-control") }}
                                 {{ render_field(form.password, class="form-control") }}

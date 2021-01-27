@@ -1,3 +1,4 @@
+{% from "includes/formhelpers.html" import render_field %}
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
@@ -20,20 +21,23 @@
             </div>
             <nav>
                 <ul id="MenuItems">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="/">Home</a></li>
                     <li><a href="product.html">Products</a></li>
                     <li><a href="">About</a></li>
-                    {% if session.logged_in %}
+                    {% if session.logged_in and session['username'] == ('admin' or 'moderator') %}
+                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/admin">Admin Panel</a></li>
+                    {% elif session.logged_in %}
                         <li><a href="/logout/">Logout</a></li>
                         <li><a href="/account/">Account</a></li>
                     {% else %}
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Register</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a></li>
                     {% endif %}
                 </ul>
             </nav>
-            <a href="cart.html"><img src="{{ url_for('static', filename='images/cart.png') }}" width="30px"
-                                     height="30px"></a>
+            <a href="/cart"><img src="{{ url_for('static', filename='images/cart.png') }}" width="30px"
+                                 height="30px"></a>
             <img src="{{ url_for('static', filename='images/menu.png') }}" class="menu-icon" onclick="menutoggle()">
         </div>
 
@@ -41,47 +45,40 @@
 </div>
 
 <!----------- single product details ------------>
-
 <div class="small-cointainer single-product">
     <div class="row">
         <div class="col-2">
-            <img src="{{ url_for('static', filename='images/gallery-1.jpg') }}" ,width="100%" id="ProductImg">
+            <img src="{{ url_for('static', filename='images/'+ product.main_photo) }}" ,width="100%" id="ProductImg">
 
             <div class="small-img-row">
                 <div class="small-img-col">
-                    <img src="{{ url_for('static', filename='images/gallery-1.jpg') }}" ,width="100%" class="small-img">
+                    <img src="{{ url_for('static', filename='images/'+ product.main_photo) }}" ,width="100%"
+                         class="small-img">
                 </div>
                 <div class="small-img-col">
-                    <img src="{{ url_for('static', filename='images/gallery-2.jpg') }}" ,width="100%" class="small-img">
+                    <img src="{{ url_for('static', filename='images/'+ product.main_photo) }}" ,width="100%"
+                         class="small-img">
                 </div>
                 <div class="small-img-col">
-                    <img src="{{ url_for('static', filename='images/gallery-3.jpg') }}" ,width="100%" class="small-img">
+                    <img src="{{ url_for('static', filename='images/'+ product.main_photo) }}" ,width="100%"
+                         class="small-img">
                 </div>
                 <div class="small-img-col">
-                    <img src="{{ url_for('static', filename='images/gallery-4.jpg') }}" ,width="100%" class="small-img">
+                    <img src="{{ url_for('static', filename='images/'+ product.main_photo) }}" ,width="100%"
+                         class="small-img">
                 </div>
             </div>
         </div>
         <div class="col-2">
             <p>Home / T-Shrit</p>
             <h1>Red Printed T-Shrit</h1>
-            <h4>$50.00</h4>
-            <select>
-                <option>Select Size</option>
-                <option>XXL</option>
-                <option>XL</option>
-                <option>L</option>
-                <option>M</option>
-                <option>S</option>
-                <option>XS</option>
-            </select>
-            <input type="number" value="1">
-            <a href="" class="btn">Add To Cart</a>
+            <h4>${{ product.price }}</h4>
+            {{ render_field(form.size, class="form-control") }}
+            {{ render_field(form.amount, class="form-control") }}
+            <a href="/add-items/{{ product.product_name }}/{{ dict(form.amount.choices).get(form.amount.data) }}" class="btn">Add To Cart</a>
             <h3>Product Details <i class="fa fa-indent"></i></h3>
             <br>
-            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
-                scrambled it to make a type specimen book.</p>
+            <p>{{ product.description }}</p>
         </div>
     </div>
 
